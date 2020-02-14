@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 import base64 as b64
 
-
 """ 
 Input data
 """
@@ -10,8 +9,8 @@ Input data
 infile = input("Type input file name: ")
 
 #output file
-outfile = 'output.xml'
-outfile = input("Type output file name (or enter for \'output.xml\': ")
+outfile = 'output-' + infile
+outfile = input("Type output file name (or enter for \'"+outfile+"\': ")
 
 uploader = 'ojs2'
 uploader = input("Uploader login: ")
@@ -39,6 +38,8 @@ number = ""
 ksec = 0
 sec = []
 authors = []
+
+sec_dict = {}
 
 #load tree
 if infile!="":
@@ -144,13 +145,19 @@ for section in sec:
                 print ("...Abbreviation (en):"+ abbrev_en)
                 newabbrev_en = input("Type new section abbreviation in English (or type \'Enter\' for keeping \'"+abbrev_en+"\'): ")
                 if newabbrev_en!="":
+                    sec_dict[abbrev_en] = newabbrev_en
                     abbrev_en = newabbrev_en;
+                else:
+                    sec_dict[abbrev_en] = abbrev_en
             if elem.attrib['locale']=="pt_BR":
                 abbrev_pt = elem.text
                 print ("...Abbreviation (pt):"+ abbrev_pt)
                 newabbrev_pt = input("Type new section abbreviation in Portuguese (or type \'Enter\' for keeping \'"+abbrev_pt+"\'): ")
                 if newabbrev_pt!="":
+                    sec_dict[abbrev_pt] = newabbrev_pt
                     abbrev_pt = newabbrev_pt;
+                else:
+                    sec_dict[abbrev_pt] = abbrev_pt
     
     if abbrev_pt == "":
         if abbrev_en != "":
@@ -229,14 +236,9 @@ for section in sec:
                                     pdffile = filelem.text
                                     pdfdecode = b64.b64decode(pdffile, None, False)
                                     outpdfname = "Artigo_"+str(seq)+".pdf"
-#                                    outpdf = open(outpdfname, 'wb')
-#                                    print("Escrevendo arquivo ", outpdfname)
-#                                    outpdf.write(pdfdecode)
-#                                    outpdf.close
-#                                    pdffile = b64.b64encode(pdfdecode, None)
                                     if "filename" in filelem.attrib:
                                         pdffilename = filelem.attrib['filename']
-            f.write("\t\t\t<article xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" locale=\"pt_BR\" date_submitted=\""+date+"\" stage=\"production\" date_published=\""+date+"\" section_ref=\""+abbrev_pt+"\" seq=\""+str(seq)+"\" access_status=\"0\">\n")
+            f.write("\t\t\t<article xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" locale=\"pt_BR\" date_submitted=\""+date+"\" stage=\"production\" date_published=\""+date+"\" section_ref=\""+sec_dict[abbrev_pt]+"\" seq=\""+str(seq)+"\" access_status=\"0\">\n")
     
             f.write("\t\t\t\t<id type=\"internal\" advice=\"ignore\">"+str(seq+5000)+"</id>\n")
 
@@ -247,13 +249,13 @@ for section in sec:
                 f.write("\t\t\t\t<title locale=\"pt_BR\">"+arttitle_pt+"</title>\n")
 
             if abstract_en != "":
-                f.write("\t\t\t\t<abstract locale=\"en_US\">"+abstract_en+"</abstract>\n")
+                f.write("\t\t\t\t<abstract locale=\"en_US\"><![CDATA["+abstract_en+"]]></abstract>\n")
 
             else:
                 f.write("\t\t\t\t<abstract locale=\"en_US\">No abstract available</abstract>\n")
 
             if abstract_pt != "":
-                f.write("\t\t\t\t<abstract locale=\"pt_BR\">"+abstract_pt+"</abstract>\n")
+                f.write("\t\t\t\t<abstract locale=\"pt_BR\"><![CDATA["+abstract_pt+"]]></abstract>\n")
 
             else:
                 f.write("\t\t\t\t<abstract locale=\"pt_BR\">Nenhum resumo disponível</abstract>\n")
@@ -312,7 +314,6 @@ for section in sec:
 
             f.write("\t\t\t\t\t<submission_file_ref id=\""+str(seq+5000)+"\" revision=\""+str(seq+5000)+"\"/>\n")
 
-#            f.write("\t\t\t\t\t<remote src=\"https://webmedia.org.br/anais/WCT-Video/p187Roesler.pdf\"/>\n")
             f.write("\t\t\t\t</article_galley>\n")
             f.write("\t\t\t</article>\n")
             arttitle_en = ""
