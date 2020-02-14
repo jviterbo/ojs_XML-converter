@@ -1,7 +1,13 @@
 # ojs_XML-converter
 XML converter specially created to convert files created by OJS 2.4 Native XML Plugin, allowing them to be imported by OJS 3.X. 
 
-IMPORTANT: The import process will only be succesful if the sections described in the XML exist in the journal, and the section title and abbreviation registered in the XML file are identical to those configured in OJS.
+IMPORTANT:
+
+The import process will only be succesful if the sections described in the XML exist in the journal, and the section title and abbreviation registered in the XML file are identical to those configured in OJS.
+
+As such, before starting the corvertion process, the user should be aware of all the sections available in the journal, together with their titles and abbreviations in all languages available.
+
+If the XML files contains any section not yet configured in the journal, it should be created with the appropriate title and abbreviation before the converted file is imported.
 
 At the beginning, the converter prompts for the following inputs:
 
